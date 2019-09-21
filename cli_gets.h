@@ -24,11 +24,14 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 #include <termios.h>
 
+typedef void (*cli_history_cb)(int dir, char *buf, size_t blen);
+
 static void
-cli_gets(FILE *f_out, char *str, char *buf, size_t blen)
+cli_gets(FILE *f_out, char *str, char *buf, size_t blen, cli_history_cb history_cb)
 {
 	unsigned char b;
 	int len = 0, off = 0, pad = 0;
@@ -66,9 +69,19 @@ cli_gets(FILE *f_out, char *str, char *buf, size_t blen)
 					off--;
 					if (off < 0) off = 0;
 				} else if (b3 == 66) { /* down */
-					/* TODO */
+					if (history_cb) {
+						history_cb(1, buf, blen);
+						len = strlen(buf);
+						off = 0;
+						pad = 0;
+					}
 				} else if (b3 == 65) { /* up */
-					/* TODO */
+					if (history_cb) {
+						history_cb(-1, buf, blen);
+						len = strlen(buf);
+						off = 0;
+						pad = 0;
+					}
 				}
 			}
 

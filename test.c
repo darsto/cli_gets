@@ -29,7 +29,7 @@ main(void)
 {
 	char buf[64];
 
-	cli_gets(stderr, "[test]", buf, sizeof(buf));
+	cli_gets(stderr, "[test]", buf, sizeof(buf), NULL);
 	fprintf(stderr, "read %s\n", buf);
 	return 0;
 }
