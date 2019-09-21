@@ -82,6 +82,12 @@ cli_gets(FILE *f_out, char *str, char *buf, size_t blen, cli_history_cb history_
 						off = 0;
 						pad = 0;
 					}
+				} else if (b3 == 49) { /* home */
+					getchar(); /* dummy */
+					off = -len;
+				} else if (b3 == 52) { /* end */
+					getchar(); /* dummy */
+					off = 0;
 				}
 			}
 
