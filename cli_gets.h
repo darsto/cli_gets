@@ -85,6 +85,22 @@ cli_gets(FILE *f_out, char *str, char *buf, size_t blen, cli_history_cb history_
 				} else if (b3 == 49) { /* home */
 					getchar(); /* dummy */
 					off = -len;
+				} else if (b3 == 51) { /* delete */
+					int i;
+
+					getchar(); /* dummy */
+					/* if there is a character at the cursor */
+					if (off > 0) {
+						/* shift the character at the right side of cursor to the left */
+						for (i = len - off; i < len - 1; i++) {
+							buf[i] = buf[i + 1];
+						}
+						/* replace the last char with a space */
+						buf[len - 1] = ' ';
+						len--;
+						pad++;
+						off--;
+					}
 				} else if (b3 == 52) { /* end */
 					getchar(); /* dummy */
 					off = 0;
@@ -106,23 +122,6 @@ cli_gets(FILE *f_out, char *str, char *buf, size_t blen, cli_history_cb history_
 				buf[len - 1] = ' ';
 				len--;
 				pad++;
-			}
-			break;
-		}
-		case 0x7E: /* delete */ {
-			int i;
-
-			/* if there is a character at the cursor */
-			if (off > 0) {
-				/* shift the character at the right side of cursor to the left */
-				for (i = len - off; i < len - 1; i++) {
-					buf[i] = buf[i + 1];
-				}
-				/* replace the last char with a space */
-				buf[len - 1] = ' ';
-				len--;
-				pad++;
-				off--;
 			}
 			break;
 		}
