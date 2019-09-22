@@ -28,8 +28,32 @@
 #include <unistd.h>
 #include <termios.h>
 
+/**
+ * Get either next or previous command.
+ *
+ * This gets called whenever the user presses the up or down arrow key.
+ *
+ * \param dir -1 for the up arrow key, 1 for the down arrow key
+ * \param buf Buffer to fill with the new command. This should not be
+ *        modified if there is no previous/next command in the history.
+ *        This buffer must be null terminated.
+ * \param blen Max size of buf (including the null terminator)
+ */
 typedef void (*cli_history_cb)(int dir, char *buf, size_t blen);
 
+/**
+ * gets() with arrow-navigation, backspace, history, home/end buttons support, etc.
+ *
+ * \param f_out FILE for printing the user input. Usually stdout or stderr.
+ * \param str Any custom string to print before the command prompt.
+ *        Must be null-terminated.
+ * \param buf Buffer where the user input will be put. It will always be
+ *        null-terminated.
+ * \param blen Max size of buf (including the null terminator).
+ * \param history_cb function to retrieve previous/next user command whenever the
+ *        up or down key is pressed. This callback is optional, can be NULL. Then
+ *        up/down keys simply won't do anything.
+ */
 static void
 cli_gets(FILE *f_out, char *str, char *buf, size_t blen, cli_history_cb history_cb)
 {
