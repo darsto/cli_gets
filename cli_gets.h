@@ -61,21 +61,26 @@ cli_gets(FILE *f_out, char *str, char *buf, size_t blen, cli_history_cb history_
 	int len = 0, off = 0, pad = 0;
 	struct termios oldt, newt;
 
-	/* terminate any previous/junk data */
+	/* terminate any previous (or junk) data */
 	buf[0] = 0;
+
 	fprintf(f_out, "\xD%s > ", str);
 
-	tcgetattr( STDIN_FILENO, &oldt);
+	/* to detect arrow key presses etc. we'll switch the current user terminal
+	 * to the "raw" mode where all special processing of input characters is
+	 * disabled. Before we do that, let's save the previous configuration so
+	 * we'll be able to restore it later */
+	tcgetattr(STDIN_FILENO, &oldt);
 	newt = oldt;
 	cfmakeraw(&newt);
+	tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
-	tcsetattr( STDIN_FILENO, TCSANOW, &newt);
 	do {
 		b = getchar();
 		switch (b) {
 		case 0x3: /* ctrl-c */
 		case 0x1a: /* ctrl-z */
-			tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
+			tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 			fprintf(f_out, "\n");
 			exit(b == 0x3 ? 0 : 1);
 			break;
@@ -188,7 +193,7 @@ cli_gets(FILE *f_out, char *str, char *buf, size_t blen, cli_history_cb history_
 		b = getchar();
 	}
 
-	tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
+	tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
 	fprintf(f_out, "\xD%s > %s\n", str, buf);
 }
 
